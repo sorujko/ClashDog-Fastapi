@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ fighter_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #18191a; color: #e0e0e0; font-family: 'Segoe UI', Arial, sans-serif; }
+        .container { max-width: 900px; margin: 40px auto; background: #232526; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.25); padding: 32px; }
+        .fighter-photo { width: 220px; height: 220px; object-fit: cover; border-radius: 12px; display: block; margin: 0 auto 18px auto; box-shadow: 0 2px 12px rgba(0,0,0,0.18);}
+        h1 { color: #ff9800; text-align: center; }
+        .stats-table, .fight-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+        .stats-table th, .stats-table td, .fight-table th, .fight-table td { padding: 10px; text-align: center; border: 1px solid #444; }
+        .stats-table th { background: #33373a; color: #ff9800; }
+        .fight-table th { background: #33373a; color: #ff9800; }
+        .win { background: #4CAF50; color: #fff; }
+        .loss { background: #F44336; color: #fff; }
+        .draw { background: orange; color: #fff; }
+        .no-contest, .cancelled { background: #444; color: #fff; }
+        .back-link { display: inline-block; margin-top: 18px; padding: 8px 18px; background: #33373a; color: #ff9800; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.18s, color 0.18s; border: 1px solid #ff9800;}
+        .back-link:hover { background: #ff9800; color: #232526; }
+        .fighter-stats {
+            width: 60%;
+            font-size: 16px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #232526;
+        }
+        .fighter-stats td, .fighter-stats th {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .fighter-stats th {
+            color: white;
+            background-color: #18191a;
+        }
+        .fighter-stats .wins {
+            background-color: #4CAF50;
+        }
+        .fighter-stats .losses {
+            background-color: #F44336;
+        }
+        .fighter-stats .score-cell {
+            background-color: #4d4d4d;
+            color: orange;
+            font-weight: bold;
+        }
+        .fighter-stats .draws {
+            background-color: orange;
+            color: white;
+        }
+        .fighter-stats .no-contest {
+            background-color: black;
+            color: white;
+        }
+        .fight-results {
+            width: 100%;
+            font-size: 16px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #232526;
+        }
+        .fight-results td, .fight-results th {
+            padding: 10px 15px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .fight-results th {
+            background-color: #18191a;
+            color: #ff9800;
+        }
+        .fight-results .result-cell {
+            color: white;
+            font-weight: bold;
+        }
+        .fight-results .win {
+            background-color: #4CAF50;
+        }
+        .fight-results .loss {
+            background-color: #F44336;
+        }
+        .fight-results .draw {
+            background-color: orange;
+        }
+        .fight-results .no-contest {
+            background-color: black;
+            color: white;
+        }
+        .fight-results .cancelled {
+            background-color: grey;
+            color: white;
+        }
+        .fight-results tr:nth-child(even) {
+            background-color: #222;
+        }
+        .fight-results tr:nth-child(odd) {
+            background-color: #232526;
+        }
+        .fight-results td.other-columns {
+            background-color: #444;
+            color: orange;
+        }
+        .fight-results .opponent-col {
+            width: 30%;
+        }
+        a.fighter-link, a.tournament-link {
+            color: #f08a33;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a.fighter-link:hover, a.tournament-link:hover {
+            color: #ff9800;
+            text-decoration: underline;
+        }
+        .stats-table th.wins, .stats-table td.wins {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .stats-table th.losses, .stats-table td.losses {
+            background-color: #F44336;
+            color: #fff;
+        }
+        .fight-table td.win, .fight-table th.win { background-color: #4CAF50; color: #fff; }
+        .fight-table td.loss, .fight-table th.loss { background-color: #F44336; color: #fff; }
+        .stats-table {
+            width: 70%;
+            font-size: 16px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #232526;
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+    <div class="container">
+        {% if not_found %}
+            <h1>Fighter not found</h1>
+            <a class="back-link" href="/fighters">&larr; Back to fighters</a>
+        {% else %}
+            <h1>{{ fighter_name }}</h1>
+            <img class="fighter-photo" src="{{ photo_url }}" alt="{{ fighter_name }}">
+            <!-- Main stats table -->
+            <table class="stats-table">
+                <tr>
+                    <th class="wins">WINS</th><td class="wins">{{ wins }}</td>
+                    <th class="losses">LOSSES</th><td class="losses">{{ losses }}</td>
+                </tr>
+                <tr>
+                    <td>KO/TKO</td><td>{{ win_ko_tko }} ({{ win_ko_tko_perc }}%)</td>
+                    <td>KO/TKO</td><td>{{ loss_ko_tko }} ({{ loss_ko_tko_perc }}%)</td>
+                </tr>
+                <tr>
+                    <td>SUB</td><td>{{ win_sub }} ({{ win_sub_perc }}%)</td>
+                    <td>SUB</td><td>{{ loss_sub }} ({{ loss_sub_perc }}%)</td>
+                </tr>
+                <tr>
+                    <td>DEC</td><td>{{ win_dec }} ({{ win_dec_perc }}%)</td>
+                    <td>DEC</td><td>{{ loss_dec }} ({{ loss_dec_perc }}%)</td>
+                </tr>
+                <tr>
+                    <td>OTHER</td><td>{{ win_other }} ({{ win_other_perc }}%)</td>
+                    <td>OTHER</td><td>{{ loss_other }} ({{ loss_other_perc }}%)</td>
+                </tr>
+            </table>
+
+            {% if draws > 0 or no_contests > 0 or cancelled > 0 %}
+            <table class="stats-table" style="margin-bottom: 32px;">
+                {% if draws > 0 %}
+                <tr>
+                    <td class="draws">DRAWS</td>
+                    <td class="score-cell">{{ draws }}</td>
+                </tr>
+                {% endif %}
+                {% if cancelled > 0 %}
+                <tr>
+                    <td class="no-contest">CANCELLED</td>
+                    <td class="score-cell">{{ cancelled }}</td>
+                </tr>
+                {% endif %}
+                {% if no_contests > 0 %}
+                <tr>
+                    <td class="no-contest">NO CONTEST</td>
+                    <td class="score-cell">{{ no_contests }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            {% endif %}
+            <h2 style="color:#ff9800;">Fight History</h2>
+            <!-- Fight history table -->
+            <table class="fight-table">
+                <tr>
+                    <th>Result</th>
+                    <th>Opponent</th>
+                    <th>Event</th>
+                    <th>Method</th>
+                    <th>Round</th>
+                    <th>Time</th>
+                    <th>Style</th>
+                </tr>
+                {% for fight in fight_results %}
+                <tr>
+                    {% if fight.Result == 'W' %}
+                        <td class="win">{{ fight.Result }}</td>
+                    {% elif fight.Result == 'L' %}
+                        <td class="loss">{{ fight.Result }}</td>
+                    {% elif fight.Result == 'DRAW' %}
+                        <td class="draw">{{ fight.Result }}</td>
+                    {% elif fight.Result == 'NO_CONTEST' %}
+                        <td class="no-contest">{{ fight.Result }}</td>
+                    {% elif fight.Result == 'CANCELLED' %}
+                        <td class="cancelled">{{ fight.Result }}</td>
+                    {% else %}
+                        <td>{{ fight.Result }}</td>
+                    {% endif %}
+                    <td>{{ fight.Opponent|safe }}</td>
+                    <td>{{ fight.Event|safe }}</td>
+                    <td>{{ fight.Method }}</td>
+                    <td>{{ fight.Round }}</td>
+                    <td>{{ fight.Time }}</td>
+                    <td>{{ fight.Style }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <a class="back-link" href="/fighters">&larr; Back to fighters</a>
+        {% endif %}
+    </div>
+    {% include "footer.html" %}
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ tournament_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #18191a;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 950px;
+            margin: 40px auto 0 auto;
+            background: #232526;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            padding: 32px 32px 24px 32px;
+        }
+        .header-flex {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .info-box {
+            background: #232526;
+            border-left: 6px solid #ff9800;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            min-width: 220px;
+            flex: 1 1 260px;
+        }
+        .info-box b {
+            color: #ff9800;
+        }
+        .tournament-img {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            background: #18191a;
+            margin-bottom: 12px;
+        }
+        h1 {
+            color: #ff9800;
+            margin-top: 0;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 28px;
+            background: #232526;
+            border-radius: 8px;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: center;
+        }
+        th {
+            background: #33373a;
+            color: #ff9800;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border-bottom: 2px solid #232526;
+        }
+        tr:nth-child(even) {
+            background: #232526;
+        }
+        tr:nth-child(odd) {
+            background: #1c1d1f;
+        }
+        tr:hover {
+            background: #33373a;
+        }
+        a {
+            color: #ff9800;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 8px 18px;
+            background: #33373a;
+            color: #ff9800;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s;
+            border: 1px solid #ff9800;
+        }
+        .back-link:hover {
+            background: #ff9800;
+            color: #232526;
+        }
+        @media (max-width: 900px) {
+            .header-flex { flex-direction: column; align-items: stretch; gap: 18px; }
+            .tournament-img { margin: 0 auto 16px auto; display: block; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 12px 2vw; }
+            table, th, td { font-size: 0.97rem; }
+            h1 { font-size: 1.3rem; }
+            .tournament-img { width: 120px; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+    <div class="container">
+        <div class="header-flex">
+            <div class="info-box">
+                <h1>{{ tournament_name }}</h1>
+                <b>Hala:</b> {{ hala }}<br>
+                <b>Miesto:</b> {{ miesto }}<br>
+                <b>Názov neoficiálny:</b> {{ nazov_neoficialny }}
+            </div>
+            <img class="tournament-img"
+                 src="/images/tournaments/{{ tournament_name.replace(' ', '_') }}.jpg"
+                 alt="{{ tournament_name }}">
+        </div>
+        <div>
+            {{ html_table | safe }}
+        </div>
+        <a class="back-link" href="/tournaments">&larr; Back to tournaments</a>
+    </div>
+    {% include "footer.html" %}
+</body>
+</html>
+<script>

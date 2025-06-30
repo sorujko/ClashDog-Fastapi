@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fighters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #18191a;
+            color: #e0e0e0;
+        }
+        .search-bar-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        .search-bar {
+            width: 350px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1.1rem;
+            background: #232526;
+            color: #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .fighters-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .fighters-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 24px;
+            gap: 18px;
+        }
+        .fighter-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            background-color: #232526;
+        }
+        .fighter-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+            outline: 2px solid #ff9800;
+        }
+        .fighter-form {
+            margin: 0;
+        }
+        .dropdown-list {
+            position: absolute;
+            background: #232526;
+            color: #e0e0e0;
+            width: 350px;
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            z-index: 10;
+        }
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+        .dropdown-item:hover, .dropdown-item.active {
+            background: #ff9800;
+            color: #232526;
+        }
+        .home-link {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: #232526;
+            color: #ff9800;
+            padding: 8px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.18s, color 0.18s;
+            z-index: 100;
+        }
+        .home-link:hover {
+            background: #ff9800;
+            color: #232526;
+        }
+        @media (max-width: 700px) {
+            .search-bar, .dropdown-list { width: 98vw; max-width: 98vw; }
+            .fighters-grid { max-width: 98vw; }
+            .home-link {
+                top: 10px;
+                left: 10px;
+                font-size: 1rem;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+    <div class="search-bar-container" style="position:relative;">
+        <input type="text" id="fighterSearch" class="search-bar" placeholder="Search or scroll fighters..." autocomplete="off">
+        <div id="dropdownList" class="dropdown-list" style="display:none; left:0; top:100%;"></div>
+    </div>
+    <div class="fighters-grid" id="fightersGrid">
+        {% for row in fighters|batch(8, '') %}
+            <div class="fighters-row">
+                {% for fighter in row %}
+                    {% if fighter %}
+                    <form class="fighter-form" action="/fighters/{{ fighter.display_name }}" method="get">
+                        <button class="fighter-btn"
+                            type="submit"
+                            title="{{ fighter.display_name }}"
+                            style="background-image: url('/images/fighters/{{ fighter.image_filename|replace('_', ' ') }}');">
+                        </button>
+                    </form>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        const fighters = [
+            {% for fighter in fighters %}
+                {{ fighter.display_name|tojson }},
+            {% endfor %}
+        ];
+        const fightersGrid = document.getElementById('fightersGrid');
+        const searchInput = document.getElementById('fighterSearch');
+        const dropdown = document.getElementById('dropdownList');
+        const container = document.querySelector('.search-bar-container');
+
+        // Position dropdown right under the input
+        function positionDropdown() {
+            const rect = searchInput.getBoundingClientRect();
+            dropdown.style.width = rect.width + "px";
+            dropdown.style.left = searchInput.offsetLeft + "px";
+            dropdown.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + "px";
+        }
+
+        // Show all fighters on focus
+        searchInput.addEventListener('focus', function() {
+            renderDropdown(fighters);
+            dropdown.style.display = 'block';
+            positionDropdown();
+        });
+
+        // Filter as you type
+        searchInput.addEventListener('input', function() {
+            const value = searchInput.value.toLowerCase();
+            const filtered = value
+                ? fighters.filter(f => f.toLowerCase().includes(value))
+                : fighters;
+            renderDropdown(filtered);
+            dropdown.style.display = 'block';
+            positionDropdown();
+        });
+
+        // Render dropdown items
+        function renderDropdown(list) {
+            if (list.length === 0) {
+                dropdown.innerHTML = '<div class="dropdown-item">No results</div>';
+                return;
+            }
+            dropdown.innerHTML = list.map(f => {
+        const jsonName = JSON.stringify(f);  // Properly escape quotes and special chars
+        return `<div class="dropdown-item" onclick='selectFighter(${jsonName})'>${f}</div>`;
+            }).join('');
+
+        }
+
+        // Select fighter from dropdown
+        function selectFighter(name) {
+            searchInput.value = name;
+            dropdown.style.display = 'none';
+            console.log("Selected fighter:", name); // Print the name in the console
+            // Redirect to the fighter's subpage
+            window.location.href = "/fighters/" + encodeURIComponent(name);
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Reposition dropdown on window resize
+        window.addEventListener('resize', positionDropdown);
+    </script>
+    {% include "footer.html" %}
+</body>
+</html>
